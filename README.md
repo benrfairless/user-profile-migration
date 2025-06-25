@@ -1,166 +1,356 @@
-# User Profile Migration Tools
+# Enhanced Mac User Profile Migration Scripts
 
-A comprehensive set of scripts for backing up and selectively restoring macOS user profiles, perfect for migrating to new user accounts or machines while maintaining full control over what gets restored.
+Complete solution for backing up and restoring your Mac configuration for clean rebuilds or migrations.
 
-## 🚀 Features
+## 🚀 Quick Start
 
-- **Complete Backup**: Backs up shell configs, development tools, applications, and more
-- **Selective Restore**: Choose exactly what to restore with an interactive menu
-- **Compressed Archives**: Creates space-efficient .tar.gz files perfect for cloud storage
-- **Security Focused**: Private SSH keys and sensitive data are handled safely
-- **Fresh Package Lists**: Always generates current Homebrew package lists
-- **Self-Contained**: Archives include all necessary scripts and documentation
+```bash
+# Test what would be backed up
+./scripts/enhanced-dry-run.sh
 
-## 📋 What Gets Backed Up
+# Create comprehensive backup
+./scripts/enhanced-backup.sh
 
-### Shell Configuration
-- Zsh, Bash configurations (`.zshrc`, `.zprofile`, `.bashrc`, etc.)
-- Oh My Zsh installation and themes
-- PowerLevel10K configuration
-- iTerm2 shell integration
+# Restore with granular control
+./scripts/enhanced-restore.sh backup_archive.tar.gz
+```
 
-### Development Tools  
-- Git configuration and global settings
-- asdf version manager with all installed tools
-- Development environment configurations
+## 📋 Overview
 
-### SSH Configuration
-- SSH config files and known hosts
-- Public keys (private keys excluded for security)
+These enhanced scripts provide comprehensive Mac system backup and restoration with granular control over what gets restored. Perfect for:
 
-### Applications
-- AWS, Azure, Docker configurations
-- VS Code settings and extensions
-- iTerm2, 1Password, and other app configs
-- Homebrew package lists (formulae, casks, extensions)
+- **Clean Mac rebuilds** - Capture everything, restore selectively
+- **New Mac setup** - Transfer your exact configuration
+- **System migrations** - Move between different Mac models
+- **Development environment setup** - Restore just your dev tools
 
-### System Information
-- Installed applications list
-- System details and versions
-- Backup manifest for verification
+## 🆕 Enhanced Features
 
-## 🛠 Usage
+### Comprehensive System Capture
+- **System Information**: Hardware specs, macOS version, installed software
+- **Application Inventory**: All apps including Mac App Store purchases
+- **System Preferences**: Dock, Finder, trackpad, keyboard settings
+- **Custom Fonts**: User-installed fonts from `~/Library/Fonts`
+- **Network Configuration**: WiFi networks, hardware ports
+- **Security Settings**: Firewall, Gatekeeper, System Integrity Protection
+- **Browser Data**: Bookmarks, preferences, extensions list
+
+### Granular Restoration Control
+- **10 Main Categories** with selective restoration
+- **Application-Specific Selection** - Choose individual app configs
+- **Launch Agent Selection** - Pick specific startup services
+- **Backup Validation** - Verify backup integrity before restore
+- **Post-Restore Verification** - Guided next steps
+
+## 📁 Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `enhanced-backup.sh` | Creates comprehensive system backup |
+| `enhanced-restore.sh` | Restores with granular selection options |
+| `enhanced-dry-run.sh` | Shows what would be backed up (no changes) |
+| `backup.sh` | Original backup script (legacy) |
+| `restore.sh` | Original restore script (legacy) |
+| `dry-run.sh` | Original dry run script (legacy) |
+
+## 🔧 Detailed Usage
 
 ### Creating a Backup
 
 ```bash
-# Run the backup script
-./scripts/backup.sh
+# See what would be backed up (recommended first step)
+./scripts/enhanced-dry-run.sh
 
-# Creates a compressed archive like:
-# user_profile_backup_20241225_120000.tar.gz (typically ~800MB)
+# Create full backup
+./scripts/enhanced-backup.sh
 ```
 
-### Restoring (Interactive Mode)
+**Output**: Creates `user_profile_backup_YYYYMMDD_HHMMSS.tar.gz` containing:
+- All configuration files and settings
+- Complete system information
+- Application inventory
+- Restoration scripts
+
+### Restoring from Backup
 
 ```bash
-# Extract and run interactive restore
-tar -xzf user_profile_backup_20241225_120000.tar.gz
-cd user_profile_backup_20241225_120000
-./user_profile_restore.sh
+# Interactive restoration (recommended)
+./scripts/enhanced-restore.sh backup_archive.tar.gz
 
-# Choose what to restore:
-# [1] Shell Configuration ○
-# [2] Homebrew Packages ○  
-# [3] Development Tools ○
-# [4] SSH Configuration ○
-# [5] Application Configurations ○
-# [A] Select All | [C] Continue | [Q] Quit
-```
-
-### Restoring (All Components)
-
-```bash
 # Restore everything without prompts
-./user_profile_restore.sh --all
+./scripts/enhanced-restore.sh backup_archive.tar.gz --all
+
+# Validate backup without restoring
+./scripts/enhanced-restore.sh backup_archive.tar.gz --validate
+
+# Get help
+./scripts/enhanced-restore.sh --help
 ```
 
-### Testing Before Backup
+## 📊 Restoration Categories
+
+### 1. Shell Configuration
+- Zsh/Bash profiles and configurations
+- Oh My Zsh themes and plugins
+- Shell aliases and functions
+- Terminal integration scripts
+
+### 2. Homebrew Packages
+- All installed formulae and casks
+- Homebrew services configuration
+- Custom taps and repositories
+- Service startup configurations
+
+### 3. Development Tools
+- Git configuration and global settings
+- asdf version manager and tool versions
+- Language-specific configurations
+- IDE and editor settings
+
+### 4. SSH Configuration
+- SSH client configuration
+- Known hosts
+- Public keys (private keys never backed up)
+- SSH agent settings
+
+### 5. Application Configurations ⭐ *Enhanced*
+**Now with individual app selection:**
+- AWS CLI credentials and config
+- Azure CLI settings
+- Docker configuration
+- VS Code settings and extensions
+- iTerm2 preferences
+- 1Password CLI settings
+- GnuPG configuration
+- NPM settings
+- And more...
+
+**Interactive Selection**: Choose exactly which application configurations to restore.
+
+### 6. System Preferences
+- Dock configuration and positioning
+- Finder preferences and sidebar
+- Trackpad and mouse settings
+- Keyboard shortcuts and input
+- Desktop and screensaver settings
+
+### 7. Custom Fonts
+- User-installed fonts from `~/Library/Fonts`
+- Automatic font cache refresh
+- Font availability verification
+
+### 8. Browser Data
+- Chrome bookmarks and preferences
+- Safari bookmarks
+- Browser extension lists
+- Search engine preferences
+
+### 9. Launch Agents ⭐ *Enhanced*
+**Now with individual agent selection:**
+- Custom startup services
+- User-defined automation scripts
+- Background task configurations
+- Service management guidance
+
+**Interactive Selection**: Choose specific launch agents to restore with guided loading instructions.
+
+### 10. Network Settings
+- WiFi network preferences
+- Network hardware configuration
+- VPN settings documentation
+- Network service priorities
+
+## 🔒 Security Features
+
+- **Private keys never backed up** - SSH private keys excluded for security
+- **Credential review required** - Manual re-authentication needed for services
+- **System preferences validation** - Manual review required for security-sensitive settings
+- **Launch agent inspection** - Individual review of startup services
+- **Network password exclusion** - WiFi passwords not captured
+
+## 💡 Best Practices
+
+### Before Backup
+1. **Clean up unnecessary files** - Remove caches and temporary data
+2. **Update software** - Ensure latest versions are captured
+3. **Document manual configurations** - Note any manual system tweaks
+4. **Test dry run** - Verify what will be backed up
+
+### During Restore
+1. **Start with essentials** - Restore shell and development tools first
+2. **Validate each step** - Check configurations work before proceeding
+3. **Review security settings** - Manually verify system preferences
+4. **Test applications** - Ensure restored configs work properly
+
+### After Restore
+1. **Re-authenticate services** - Sign back into AWS, GitHub, etc.
+2. **Verify SSH keys** - Test SSH connections
+3. **Check application licenses** - Re-activate software as needed
+4. **Update system** - Install any pending macOS updates
+
+## 🛠 Advanced Usage
+
+### Backup Validation
+```bash
+# Validate backup contents without restoring
+./scripts/enhanced-restore.sh backup.tar.gz --validate
+```
+
+### Selective Application Restore
+When selecting "Application Configurations", you'll get a submenu to choose specific apps:
+```
+Available application configurations:
+  [1] AWS CLI (.aws)
+  [2] Docker (.docker)
+  [3] VS Code (.vscode)
+  [4] iTerm2 (.iterm2)
+  ...
+```
+
+### Launch Agent Management
+When selecting "Launch Agents", choose specific services:
+```
+Available launch agents:
+  [1] com.example.myservice.plist
+  [2] homebrew.mxcl.redis.plist
+  ...
+```
+
+### System Information Review
+```bash
+# View captured system information
+tar -xzf backup.tar.gz
+cat user_profile_backup_*/system_info/backup_summary.txt
+```
+
+## 📋 Backup Contents
+
+### System Information
+- Hardware specifications and model
+- macOS version and build number
+- Installed applications inventory
+- System profiler data
+- Disk usage and storage info
+- Environment variables
+
+### Configuration Files
+- Shell configurations (`.zshrc`, `.bashrc`, etc.)
+- Development tools (`.gitconfig`, `.tool-versions`)
+- Application settings directories
+- SSH configuration (public keys only)
+- Custom fonts and preferences
+
+### Package Management
+- Homebrew Brewfile with all packages
+- Homebrew services configuration
+- Custom taps and repositories
+- Package version information
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Backup too large**
+- Review what's being backed up with dry run
+- Exclude cache directories (already done automatically)
+- Consider selective backup of large app configs
+
+**Restore fails**
+- Validate backup first: `--validate` flag
+- Check disk space on target system
+- Ensure proper permissions on target directories
+
+**Applications don't work after restore**
+- Re-authenticate with services
+- Check application licenses
+- Verify file permissions
+- Restart applications
+
+**Launch agents don't start**
+- Review agent files before loading
+- Use `launchctl load` manually
+- Check system logs for errors
+
+### Getting Help
 
 ```bash
-# See what would be backed up without creating a backup
-./scripts/dry-run.sh
+# Detailed help for restore script
+./scripts/enhanced-restore.sh --help
+
+# View backup contents
+tar -tzf backup_archive.tar.gz | head -20
+
+# Check system compatibility
+cat backup_directory/system_info/backup_summary.txt
 ```
 
-## 📁 Repository Structure
+## 🔄 Migration Workflow
 
-```
-user-profile-migration/
-├── README.md                 # This file
-├── scripts/
-│   ├── backup.sh            # Main backup script
-│   ├── restore.sh           # Selective restore script
-│   └── dry-run.sh           # Test what would be backed up
-├── docs/
-│   └── migration-guide.md   # Detailed migration instructions
-└── examples/
-    └── sample-usage.md      # Usage examples and scenarios
-```
+### Complete Mac Rebuild
+1. **Preparation**
+   ```bash
+   ./scripts/enhanced-dry-run.sh  # Review what will be backed up
+   ./scripts/enhanced-backup.sh   # Create backup
+   ```
 
-## 🔒 Security Considerations
+2. **Fresh macOS Install**
+   - Perform clean macOS installation
+   - Complete initial setup
+   - Install Xcode Command Line Tools
 
-### ✅ Safe Practices
-- Private SSH keys are **never** backed up
-- Scripts contain no personal data
-- Backup archives should **never** be committed to version control
-- Public keys only are included in SSH backups
+3. **Restoration**
+   ```bash
+   ./scripts/enhanced-restore.sh backup.tar.gz
+   # Select categories interactively
+   # Choose specific app configs and launch agents
+   ```
 
-### ⚠️ Important Warnings
-- **Never upload backup archives to public repositories**
-- **Review restored configurations** for hardcoded personal paths
-- **Re-authenticate with services** after restoration
-- **Regenerate SSH keys** if needed for new environments
+4. **Post-Restore**
+   - Re-authenticate services
+   - Verify configurations
+   - Install additional software as needed
 
-## 🎯 Common Use Cases
+### Selective Migration
+For moving specific configurations to a new system:
+1. Create backup on source system
+2. Transfer backup archive
+3. Use selective restore to choose only needed components
+4. Manually configure remaining items
 
-### New Machine Setup
-Select shell configuration and development tools for a clean, productive environment.
+## 📝 Version History
 
-### Work vs Personal Separation  
-Restore different components for different contexts and requirements.
+### Enhanced Version (Current)
+- ✅ Granular application configuration selection
+- ✅ Individual launch agent selection
+- ✅ Comprehensive system information capture
+- ✅ Backup validation
+- ✅ 10 restoration categories
+- ✅ Enhanced security practices
 
-### Testing Configurations
-Restore individual components to test compatibility and troubleshoot issues.
-
-### Minimal Installations
-Choose only essential tools for lightweight setups or containers.
-
-### Gradual Migration
-Restore components incrementally to ensure everything works correctly.
-
-## 📖 Documentation
-
-- **[Migration Guide](docs/migration-guide.md)** - Complete step-by-step migration instructions
-- **[Sample Usage](examples/sample-usage.md)** - Common scenarios and examples
-- **Script Help** - Run any script with `--help` for detailed usage information
+### Original Version (Legacy)
+- Basic configuration backup
+- All-or-nothing restoration
+- Limited system information
+- 5 restoration categories
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Test your changes thoroughly
-4. Submit a pull request
+To enhance these scripts:
+1. Test thoroughly on different macOS versions
+2. Add support for additional applications
+3. Improve error handling and validation
+4. Enhance documentation with examples
 
-### Development Guidelines
-- Keep scripts generic and avoid hardcoded personal information
-- Test on clean systems when possible
-- Update documentation for new features
-- Follow existing code style and patterns
+## ⚠️ Important Notes
 
-## ⚠️ Disclaimer
+- **Test on non-production systems first**
+- **Review all restored configurations**
+- **Keep backups in multiple locations**
+- **Update scripts for new macOS versions**
+- **Never share backup archives** (contain personal data)
 
-These scripts modify system configurations and install software. Always:
-- **Test in a safe environment first**
-- **Review scripts before running**
-- **Keep backups of important data**
-- **Understand what each script does**
+---
 
-Use at your own risk. The authors are not responsible for any data loss or system issues.
+**Ready to rebuild your Mac with confidence!** 🚀
 
-## 📄 License
-
-MIT License - see LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-Built for the macOS development community to make user profile migrations safer, more flexible, and more reliable.
+Start with `./scripts/enhanced-dry-run.sh` to see what would be captured, then create your comprehensive backup with `./scripts/enhanced-backup.sh`.
