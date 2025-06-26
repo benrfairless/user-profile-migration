@@ -303,10 +303,11 @@ if [[ -d "$HOME/Library/Application Support/Google/Chrome" ]]; then
     fi
 fi
 
-# Safari bookmarks
-if [[ -f "$HOME/Library/Safari/Bookmarks.plist" ]]; then
-    safe_copy "$HOME/Library/Safari/Bookmarks.plist" "$BACKUP_DIR/browser_data/"
-fi
+# Safari bookmarks - Skipped due to macOS System Integrity Protection
+# Note: Safari bookmarks are protected by SIP and cannot be backed up programmatically
+# Users should manually export bookmarks via Safari > File > Export Bookmarks
+echo "Note: Safari bookmarks skipped (protected by System Integrity Protection)"
+echo "      To backup Safari bookmarks manually: Safari > File > Export Bookmarks"
 
 echo "=== Creating Enhanced System Information ==="
 cat > "$BACKUP_DIR/system_info/backup_summary.txt" << EOF
