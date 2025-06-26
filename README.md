@@ -94,6 +94,36 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 ./scripts/restore.sh --help
 ```
 
+### Working with Encrypted Backups
+
+**Encrypted backups are created by default** and have `.encrypted.tar.gz` extension:
+
+```bash
+# Create encrypted backup (default behavior)
+./scripts/backup.sh
+# Output: user_profile_backup_20241225_120000.encrypted.tar.gz
+
+# Restore encrypted backup (password will be prompted)
+./scripts/restore.sh user_profile_backup_20241225_120000.encrypted.tar.gz
+
+# Validate encrypted backup
+./scripts/restore.sh backup.encrypted.tar.gz --validate
+```
+
+**Requirements for encrypted backups:**
+- OpenSSL must be installed (usually pre-installed on macOS)
+- Same password used for backup must be provided during restore
+- Decryption happens automatically when encrypted backup is detected
+
+**Troubleshooting encryption:**
+```bash
+# If OpenSSL is missing, install via Homebrew
+brew install openssl
+
+# Create unencrypted backup if needed (not recommended)
+./scripts/backup.sh --no-password
+```
+
 ## 📊 Restoration Categories
 
 ### 1. Shell Configuration
@@ -175,6 +205,10 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 
 ## 🔒 Security Features
 
+- **Password protection by default** - All backups encrypted with AES-256-CBC encryption
+- **Strong key derivation** - PBKDF2 with 100,000 iterations for enhanced security
+- **Automatic encryption detection** - Seamless handling of encrypted backup archives
+- **Secure password handling** - Passwords cleared from memory after use
 - **Private keys never backed up** - SSH private keys excluded for security
 - **Credential review required** - Manual re-authentication needed for services
 - **System preferences validation** - Manual review required for security-sensitive settings
