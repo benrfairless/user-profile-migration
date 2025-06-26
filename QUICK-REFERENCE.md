@@ -1,22 +1,22 @@
-# Quick Reference - Enhanced Mac Migration Scripts
+# Quick Reference - Mac Migration Scripts
 
 ## 🚀 Essential Commands
 
 ```bash
 # See what would be backed up
-./scripts/enhanced-dry-run.sh
+./scripts/dry-run.sh
 
 # Create comprehensive backup
-./scripts/enhanced-backup.sh
+./scripts/backup.sh
 
 # Interactive restore (recommended)
-./scripts/enhanced-restore.sh backup.tar.gz
+./scripts/restore.sh backup.tar.gz
 
 # Restore everything without prompts
-./scripts/enhanced-restore.sh backup.tar.gz --all
+./scripts/restore.sh backup.tar.gz --all
 
 # Validate backup integrity
-./scripts/enhanced-restore.sh backup.tar.gz --validate
+./scripts/restore.sh backup.tar.gz --validate
 ```
 
 ## 📋 Restoration Categories

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Enhanced Dry Run of User Profile Backup Script
-# This shows what the enhanced backup script would capture without actually doing it
+# Dry Run of User Profile Backup Script
+# This shows what the backup script would capture without actually doing it
 
-echo "=== ENHANCED DRY RUN MODE - No files will be copied ==="
+echo "=== DRY RUN MODE - No files will be copied ==="
 echo ""
 
 BACKUP_DIR="$HOME/user_profile_backup_$(date +%Y%m%d_%H%M%S)"
-echo "Would create enhanced backup in: $BACKUP_DIR"
+echo "Would create backup in: $BACKUP_DIR"
 
 # Function to simulate copying files/directories
 dry_run_copy() {
@@ -231,10 +231,10 @@ echo "  ✓ Application installation assistance"
 echo "  ✓ Backup validation before restore"
 echo "  ✓ Post-restore verification steps"
 echo ""
-echo "Ready to run the enhanced backup? This comprehensive backup will help you:"
+echo "Ready to run the backup? This comprehensive backup will help you:"
 echo "  • Rebuild your Mac exactly as it was"
 echo "  • Selectively restore only what you need"
 echo "  • Understand what software and settings you had"
 echo "  • Maintain security best practices"
 echo ""
-echo "Run: ./enhanced-backup.sh"
+echo "Run: ./backup.sh"

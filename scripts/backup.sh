@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Enhanced User Profile Backup Script
+# User Profile Backup Script
 # This script backs up comprehensive system information for complete Mac rebuild
 
 set -e
 
 # Check for help flag
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-    echo "Enhanced User Profile Backup Script"
+    echo "User Profile Backup Script"
     echo "Creates comprehensive system backup for Mac rebuild"
     echo ""
     echo "Usage: $0 [--no-password] [--help]"
@@ -423,23 +423,21 @@ echo "Compressed size: $COMPRESSED_SIZE"
 
 # Copy scripts and documentation into the backup directory
 echo "Copying scripts and documentation to backup location..."
-cp "$0" "$BACKUP_DIR/enhanced_backup.sh"
+cp "$0" "$BACKUP_DIR/backup.sh"
 
 # Find and copy the restore script
 RESTORE_SCRIPT_PATH=""
-if [[ -f "$(dirname "$0")/enhanced-restore.sh" ]]; then
-    RESTORE_SCRIPT_PATH="$(dirname "$0")/enhanced-restore.sh"
-elif [[ -f "$(dirname "$0")/restore.sh" ]]; then
+if [[ -f "$(dirname "$0")/restore.sh" ]]; then
     RESTORE_SCRIPT_PATH="$(dirname "$0")/restore.sh"
 fi
 
 if [[ -n "$RESTORE_SCRIPT_PATH" ]]; then
     echo "Found restore script: $RESTORE_SCRIPT_PATH"
-    cp "$RESTORE_SCRIPT_PATH" "$BACKUP_DIR/enhanced_restore.sh"
-    chmod +x "$BACKUP_DIR/enhanced_restore.sh"
+    cp "$RESTORE_SCRIPT_PATH" "$BACKUP_DIR/restore.sh"
+    chmod +x "$BACKUP_DIR/restore.sh"
     echo "Restore script copied and made executable"
 else
-    echo "Warning: Enhanced restore script not found."
+    echo "Warning: Restore script not found."
 fi
 
 # Update the archive with the scripts
@@ -516,7 +514,7 @@ if [[ "$USE_PASSWORD" == true ]]; then
 fi
 
 echo ""
-echo "=== Enhanced Backup Complete ==="
+echo "=== Backup Complete ==="
 echo "Backup archive: $(basename "$ARCHIVE_NAME")"
 echo "Final size: $COMPRESSED_SIZE (was $ORIGINAL_SIZE)"
 
@@ -525,7 +523,7 @@ if [[ "$USE_PASSWORD" == true ]]; then
     echo ""
     echo "To restore this encrypted backup:"
     echo "1. Transfer $(basename "$ARCHIVE_NAME") to your new Mac"
-    echo "2. Run: ./enhanced-restore.sh $(basename "$ARCHIVE_NAME")"
+    echo "2. Run: ./restore.sh $(basename "$ARCHIVE_NAME")"
     echo "3. Enter your password when prompted"
     echo ""
     echo "⚠️  Important: Keep your password safe! Without it, your backup cannot be restored."
@@ -535,10 +533,10 @@ else
     echo "Transfer Instructions:"
     echo "1. Copy $(basename "$ARCHIVE_NAME") to your backup location"
     echo "2. On your new Mac, extract: tar -xzf $(basename "$ARCHIVE_NAME")"
-    echo "3. Run: ./$(basename "$BACKUP_DIR")/enhanced_restore.sh ./$(basename "$BACKUP_DIR")"
+    echo "3. Run: ./$(basename "$BACKUP_DIR")/restore.sh ./$(basename "$BACKUP_DIR")"
 fi
 echo ""
-echo "This enhanced backup includes:"
+echo "This backup includes:"
 echo "✓ All original configurations"
 echo "✓ Complete system information"
 echo "✓ Installed applications list"
@@ -551,7 +549,7 @@ echo ""
 echo "Transfer Instructions:"
 echo "1. Copy $ARCHIVE_NAME to your backup location (iCloud, external drive, etc.)"
 echo "2. On your new Mac, download and extract: tar -xzf $(basename "$ARCHIVE_NAME")"
-echo "3. Run: ./$(basename "$BACKUP_DIR")/enhanced_restore.sh ./$(basename "$BACKUP_DIR")"
+echo "3. Run: ./$(basename "$BACKUP_DIR")/restore.sh ./$(basename "$BACKUP_DIR")"
 echo ""
 echo "Cleaning up uncompressed backup directory..."
 rm -rf "$BACKUP_DIR"

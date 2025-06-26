@@ -1,4 +1,4 @@
-# Enhanced Mac User Profile Migration Scripts
+# Mac User Profile Migration Scripts
 
 Complete solution for backing up and restoring your Mac configuration for clean rebuilds or migrations.
 
@@ -6,16 +6,16 @@ Complete solution for backing up and restoring your Mac configuration for clean 
 
 ```bash
 # Test what would be backed up
-./scripts/enhanced-dry-run.sh
+./scripts/dry-run.sh
 
 # Create password-protected backup (default)
-./scripts/enhanced-backup.sh
+./scripts/backup.sh
 
 # Create unencrypted backup (not recommended)
-./scripts/enhanced-backup.sh --no-password
+./scripts/backup.sh --no-password
 
 # Restore with granular control
-./scripts/enhanced-restore.sh backup.encrypted.tar.gz
+./scripts/restore.sh backup.encrypted.tar.gz
 ```
 
 ## 📋 Overview
@@ -56,9 +56,9 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 
 | Script | Purpose |
 |--------|---------|
-| `enhanced-backup.sh` | Creates comprehensive system backup |
-| `enhanced-restore.sh` | Restores with granular selection options |
-| `enhanced-dry-run.sh` | Shows what would be backed up (no changes) |
+| `backup.sh` | Creates comprehensive system backup |
+| `restore.sh` | Restores with granular selection options |
+| `dry-run.sh` | Shows what would be backed up (no changes) |
 
 ## 🔧 Detailed Usage
 
@@ -66,10 +66,10 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 
 ```bash
 # See what would be backed up (recommended first step)
-./scripts/enhanced-dry-run.sh
+./scripts/dry-run.sh
 
 # Create full backup
-./scripts/enhanced-backup.sh
+./scripts/backup.sh
 ```
 
 **Output**: Creates `user_profile_backup_YYYYMMDD_HHMMSS.tar.gz` containing:
@@ -82,16 +82,16 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 
 ```bash
 # Interactive restoration (recommended)
-./scripts/enhanced-restore.sh backup_archive.tar.gz
+./scripts/restore.sh backup_archive.tar.gz
 
 # Restore everything without prompts
-./scripts/enhanced-restore.sh backup_archive.tar.gz --all
+./scripts/restore.sh backup_archive.tar.gz --all
 
 # Validate backup without restoring
-./scripts/enhanced-restore.sh backup_archive.tar.gz --validate
+./scripts/restore.sh backup_archive.tar.gz --validate
 
 # Get help
-./scripts/enhanced-restore.sh --help
+./scripts/restore.sh --help
 ```
 
 ## 📊 Restoration Categories
@@ -326,7 +326,7 @@ For moving specific configurations to a new system:
 
 ## 📝 Version History
 
-### Enhanced Version (Current)
+### Current Version
 - ✅ Granular application configuration selection
 - ✅ Individual launch agent selection
 - ✅ Comprehensive system information capture
@@ -355,4 +355,4 @@ To enhance these scripts:
 
 **Ready to rebuild your Mac with confidence!** 🚀
 
-Start with `./scripts/enhanced-dry-run.sh` to see what would be captured, then create your comprehensive backup with `./scripts/enhanced-backup.sh`.
+Start with `./scripts/dry-run.sh` to see what would be captured, then create your comprehensive backup with `./scripts/backup.sh`.

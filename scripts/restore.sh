@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Enhanced User Profile Restore Script
+# User Profile Restore Script
 # This script provides granular restoration options for complete Mac rebuild
 
 set -e
 
 # Check for help flag
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-    echo "Enhanced User Profile Restore Script"
+    echo "User Profile Restore Script"
     echo "Provides granular restoration options for complete Mac rebuild"
     echo ""
     echo "Usage: $0 [backup_directory_or_archive] [--all] [--category]"
@@ -32,7 +32,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
     echo "  9. Launch Agents (custom startup services) - Individual selection"
     echo "  10. Network Settings (WiFi networks, VPN configs)"
     echo ""
-    echo "Enhanced Features:"
+    echo "Features:"
     echo "  • Application Configurations: Choose specific apps (AWS, Docker, VS Code, etc.)"
     echo "  • Launch Agents: Select individual startup services with loading guidance"
     echo "  • Comprehensive Validation: Verify all backup components before restoration"
@@ -576,7 +576,7 @@ if [[ "$RESTORE_ALL_FLAG" == true ]]; then
         done < <(find "$BACKUP_DIR/launchd/user_launch_agents_backup" -name "*.plist" -print0 2>/dev/null)
     fi
 else
-    echo "=== Enhanced Selective Restore Options ==="
+    echo "=== Selective Restore Options ==="
     echo "Choose what you want to restore (you can select multiple options):"
     echo ""
 
@@ -911,7 +911,7 @@ chmod 700 "$HOME/.gnupg" 2>/dev/null || true
 chmod 600 "$HOME/.gnupg"/* 2>/dev/null || true
 
 echo ""
-echo "=== Enhanced Restore Complete ==="
+echo "=== Restore Complete ==="
 echo ""
 echo "Restored components:"
 [ "$RESTORE_SHELL" = true ] && echo "✓ Shell Configuration"

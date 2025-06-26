@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Enhanced Mac User Profile Migration Scripts will be documented in this file.
+All notable changes to the Mac User Profile Migration Scripts will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -8,15 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Enhanced backup script with comprehensive system information capture
-- Enhanced restore script with granular restoration options
+- Comprehensive backup script with system information capture
+- Granular restore script with selective restoration options
 - Password protection by default using AES-256-CBC encryption
 - Individual application configuration selection
 - Individual launch agent selection
 - Comprehensive backup validation
 - Support for encrypted backup archives
 - Detailed backup manifest generation
-- Enhanced system information collection
+- System information collection
 - Browser data backup (bookmarks, preferences, extensions)
 - Custom fonts backup and restoration
 - Network configuration capture
@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Launch agents management with guided loading
 - Post-restore verification and guidance
 
-### Enhanced
+### Features
 - Complete directory structure with 12 organized categories
 - Robust error handling and validation
 - User-friendly interactive menus
@@ -40,4 +40,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-*This project started fresh with enhanced functionality. Previous versions have been deprecated in favor of this comprehensive solution.*
+*This project provides a comprehensive solution for Mac user profile migration and system backup.*
