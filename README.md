@@ -59,9 +59,6 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 | `enhanced-backup.sh` | Creates comprehensive system backup |
 | `enhanced-restore.sh` | Restores with granular selection options |
 | `enhanced-dry-run.sh` | Shows what would be backed up (no changes) |
-| `backup.sh` | Original backup script (legacy) |
-| `restore.sh` | Original restore script (legacy) |
-| `dry-run.sh` | Original dry run script (legacy) |
 
 ## 🔧 Detailed Usage
 
@@ -333,15 +330,10 @@ For moving specific configurations to a new system:
 - ✅ Granular application configuration selection
 - ✅ Individual launch agent selection
 - ✅ Comprehensive system information capture
-- ✅ Backup validation
+- ✅ Backup validation and verification
 - ✅ 10 restoration categories
 - ✅ Enhanced security practices
-
-### Original Version (Legacy)
-- Basic configuration backup
-- All-or-nothing restoration
-- Limited system information
-- 5 restoration categories
+- ✅ Password protection by default
 
 ## 🤝 Contributing
 

@@ -37,6 +37,8 @@ fi
 
 # Check for no-password flag
 USE_PASSWORD=true
+BACKUP_PASSWORD=""
+
 if [[ "$1" == "--no-password" ]]; then
     USE_PASSWORD=false
     echo "⚠️  WARNING: Password protection disabled"
@@ -84,6 +86,66 @@ if [[ $AVAILABLE_GB -lt 5 ]]; then
     fi
 else
     echo "✅ Sufficient disk space available (${AVAILABLE_GB}GB)"
+fi
+
+# Collect backup password early if encryption is enabled
+if [[ "$USE_PASSWORD" == true ]]; then
+    echo ""
+    echo "=== Setting Up Backup Encryption ==="
+    echo "Your backup will contain personal configuration data and will be encrypted."
+    echo "Please set a password for your backup archive."
+    echo ""
+    
+    # Prompt for password
+    while true; do
+        echo "Enter password for backup encryption:"
+        read -s BACKUP_PASSWORD
+        echo "Confirm password:"
+        read -s PASSWORD_CONFIRM
+        
+        if [[ -z "$BACKUP_PASSWORD" ]]; then
+            echo "❌ Error: Password cannot be empty"
+            echo ""
+            continue
+        fi
+        
+        if [[ "$BACKUP_PASSWORD" != "$PASSWORD_CONFIRM" ]]; then
+            echo "❌ Error: Passwords do not match"
+            echo ""
+            continue
+        fi
+        
+        # Check password strength (enhanced validation)
+        if [[ ${#BACKUP_PASSWORD} -lt 8 ]]; then
+            echo "⚠️  Warning: Password is less than 8 characters"
+            read -p "Continue with this password? (y/N): " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo ""
+                continue
+            fi
+        elif [[ ${#BACKUP_PASSWORD} -lt 12 ]]; then
+            echo "💡 Tip: Passwords 12+ characters are more secure"
+        fi
+        
+        # Check for common weak passwords
+        if [[ "$BACKUP_PASSWORD" =~ ^[0-9]+$ ]]; then
+            echo "⚠️  Warning: Password contains only numbers"
+            read -p "Continue with this password? (y/N): " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo ""
+                continue
+            fi
+        fi
+        
+        break
+    done
+    
+    # Clear confirmation password from memory
+    unset PASSWORD_CONFIRM
+    echo "✅ Backup password set successfully"
+    echo ""
 fi
 
 mkdir -p "$BACKUP_DIR"
@@ -384,68 +446,19 @@ fi
 echo "Creating final compressed archive with all scripts included..."
 tar -czf "$ARCHIVE_NAME" -C "$(dirname "$BACKUP_DIR")" "$(basename "$BACKUP_DIR")"
 
-# Password protection (default behavior)
+# Password protection (using pre-collected password)
 if [[ "$USE_PASSWORD" == true ]]; then
     echo ""
-    echo "=== Password Protection ==="
-    echo "Your backup contains personal configuration data and will be encrypted."
-    echo ""
+    echo "=== Encrypting Backup Archive ==="
+    echo "🔒 Encrypting your backup with the password you provided..."
     
-    # Prompt for password
-    while true; do
-        echo "Enter password for backup encryption:"
-        read -s PASSWORD
-        echo "Confirm password:"
-        read -s PASSWORD_CONFIRM
-        
-        if [[ -z "$PASSWORD" ]]; then
-            echo "❌ Error: Password cannot be empty"
-            echo ""
-            continue
-        fi
-        
-        if [[ "$PASSWORD" != "$PASSWORD_CONFIRM" ]]; then
-            echo "❌ Error: Passwords do not match"
-            echo ""
-            continue
-        fi
-        
-        # Check password strength (enhanced validation)
-        if [[ ${#PASSWORD} -lt 8 ]]; then
-            echo "⚠️  Warning: Password is less than 8 characters"
-            read -p "Continue with this password? (y/N): " -n 1 -r
-            echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                echo ""
-                continue
-            fi
-        elif [[ ${#PASSWORD} -lt 12 ]]; then
-            echo "💡 Tip: Passwords 12+ characters are more secure"
-        fi
-        
-        # Check for common weak passwords
-        if [[ "$PASSWORD" =~ ^[0-9]+$ ]]; then
-            echo "⚠️  Warning: Password contains only numbers"
-            read -p "Continue with this password? (y/N): " -n 1 -r
-            echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                echo ""
-                continue
-            fi
-        fi
-        
-        break
-    done
-    
-    # Create encrypted version
+    # Create encrypted version using the password collected earlier
     ENCRYPTED_ARCHIVE="${ARCHIVE_NAME%.tar.gz}.encrypted.tar.gz"
-    echo ""
-    echo "🔒 Encrypting backup archive..."
     echo "Creating encrypted archive: $(basename "$ENCRYPTED_ARCHIVE")"
     
     # Use AES-256-CBC encryption with stronger key derivation
     echo "🔐 Encrypting with AES-256-CBC (this may take a moment)..."
-    openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 -in "$ARCHIVE_NAME" -out "$ENCRYPTED_ARCHIVE" -pass pass:"$PASSWORD"
+    openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 -in "$ARCHIVE_NAME" -out "$ENCRYPTED_ARCHIVE" -pass pass:"$BACKUP_PASSWORD"
     
     if [[ $? -eq 0 ]]; then
         echo "✅ Backup successfully encrypted with AES-256-CBC"
@@ -499,8 +512,7 @@ if [[ "$USE_PASSWORD" == true ]]; then
     fi
     
     # Clear password from memory
-    unset PASSWORD
-    unset PASSWORD_CONFIRM
+    unset BACKUP_PASSWORD
 fi
 
 echo ""

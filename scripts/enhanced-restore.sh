@@ -35,7 +35,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
     echo "Enhanced Features:"
     echo "  • Application Configurations: Choose specific apps (AWS, Docker, VS Code, etc.)"
     echo "  • Launch Agents: Select individual startup services with loading guidance"
-    echo "  • Backup Validation: Verify backup integrity before restoration"
+    echo "  • Comprehensive Validation: Verify all backup components before restoration"
     echo "  • Post-Restore Guidance: Step-by-step next actions"
     echo "  • Password Protection: Support for encrypted backup archives"
     echo ""
@@ -195,30 +195,43 @@ if [[ ! -d "$BACKUP_DIR" ]]; then
     exit 1
 fi
 
-# Validation function
+# Enhanced validation function
 validate_backup() {
     echo "=== Validating Backup Contents ==="
     
     local validation_passed=true
+    local warnings=0
     
-    # Check for essential directories
+    # Check for all expected directories from enhanced backup
+    local all_dirs=("shell_config" "development" "homebrew" "system_info" "app_configs" "ssh_keys" "system_preferences" "applications" "fonts" "network" "security" "launchd" "browser_data")
     local essential_dirs=("shell_config" "development" "homebrew" "system_info")
-    for dir in "${essential_dirs[@]}"; do
+    
+    echo "Checking backup directory structure..."
+    for dir in "${all_dirs[@]}"; do
         if [[ -d "$BACKUP_DIR/$dir" ]]; then
             echo "✓ Found: $dir"
         else
-            echo "⚠ Missing: $dir"
-            validation_passed=false
+            if [[ " ${essential_dirs[@]} " =~ " ${dir} " ]]; then
+                echo "❌ Missing essential: $dir"
+                validation_passed=false
+            else
+                echo "⚠ Missing optional: $dir"
+                ((warnings++))
+            fi
         fi
     done
+    
+    echo ""
+    echo "Checking key backup files..."
     
     # Check for system info
     if [[ -f "$BACKUP_DIR/system_info/backup_summary.txt" ]]; then
         echo "✓ Found: System information"
         echo "  Backup details:"
-        head -10 "$BACKUP_DIR/system_info/backup_summary.txt" | sed 's/^/    /'
+        head -5 "$BACKUP_DIR/system_info/backup_summary.txt" | sed 's/^/    /'
     else
-        echo "⚠ Missing: System information"
+        echo "❌ Missing: System information"
+        validation_passed=false
     fi
     
     # Check for Homebrew data
@@ -228,6 +241,7 @@ validate_backup() {
         echo "✓ Found: Homebrew data ($formula_count formulae, $cask_count casks)"
     else
         echo "⚠ Missing: Homebrew data"
+        ((warnings++))
     fi
     
     # Check for applications list
@@ -236,14 +250,58 @@ validate_backup() {
         echo "✓ Found: Applications list ($app_count entries)"
     else
         echo "⚠ Missing: Applications list"
+        ((warnings++))
+    fi
+    
+    # Check for detailed manifest (new feature)
+    if [[ -f "$BACKUP_DIR/detailed_manifest.txt" ]]; then
+        local file_count=$(grep -c "^-" "$BACKUP_DIR/detailed_manifest.txt" 2>/dev/null || echo "0")
+        echo "✓ Found: Detailed manifest ($file_count files cataloged)"
+    else
+        echo "⚠ Missing: Detailed manifest (older backup format)"
+        ((warnings++))
+    fi
+    
+    # Check for app configs
+    if [[ -d "$BACKUP_DIR/app_configs" ]]; then
+        local config_count=$(find "$BACKUP_DIR/app_configs" -maxdepth 1 -type d -o -type f | wc -l | tr -d ' ')
+        echo "✓ Found: Application configurations ($((config_count - 1)) items)"
+    else
+        echo "⚠ Missing: Application configurations"
+        ((warnings++))
+    fi
+    
+    # Check for fonts
+    if [[ -d "$BACKUP_DIR/fonts/user_fonts_backup" ]]; then
+        local font_count=$(find "$BACKUP_DIR/fonts/user_fonts_backup" -type f 2>/dev/null | wc -l | tr -d ' ')
+        echo "✓ Found: Custom fonts ($font_count files)"
+    else
+        echo "⚠ Missing: Custom fonts backup"
+        ((warnings++))
+    fi
+    
+    # Check for launch agents
+    if [[ -d "$BACKUP_DIR/launchd/user_launch_agents_backup" ]]; then
+        local agent_count=$(find "$BACKUP_DIR/launchd/user_launch_agents_backup" -name "*.plist" 2>/dev/null | wc -l | tr -d ' ')
+        echo "✓ Found: Launch agents ($agent_count agents)"
+    else
+        echo "⚠ Missing: Launch agents backup"
+        ((warnings++))
     fi
     
     echo ""
+    echo "Validation Summary:"
     if [[ "$validation_passed" == true ]]; then
-        echo "✅ Backup validation passed"
+        if [[ $warnings -eq 0 ]]; then
+            echo "✅ Backup validation passed - Complete backup detected"
+        else
+            echo "✅ Backup validation passed with $warnings warnings - Functional backup"
+            echo "   Some optional components are missing but core functionality is intact"
+        fi
         return 0
     else
-        echo "❌ Backup validation failed - some components are missing"
+        echo "❌ Backup validation failed - Essential components are missing"
+        echo "   This backup may not restore properly"
         return 1
     fi
 }
@@ -760,9 +818,19 @@ if [[ "$RESTORE_BROWSER" = true ]]; then
         echo "  File: $BACKUP_DIR/browser_data/Bookmarks"
     fi
     
+    if [[ -f "$BACKUP_DIR/browser_data/chrome_preferences.json" ]]; then
+        echo "⚠ Manual step required: Review Chrome preferences"
+        echo "  File: $BACKUP_DIR/browser_data/chrome_preferences.json"
+    fi
+    
     if [[ -f "$BACKUP_DIR/browser_data/Bookmarks.plist" ]]; then
         echo "⚠ Manual step required: Import Safari bookmarks"
         echo "  File: $BACKUP_DIR/browser_data/Bookmarks.plist"
+    fi
+    
+    if [[ -f "$BACKUP_DIR/browser_data/chrome_extensions.txt" ]]; then
+        echo "⚠ Manual step required: Review Chrome extensions list"
+        echo "  File: $BACKUP_DIR/browser_data/chrome_extensions.txt"
     fi
 fi
 
