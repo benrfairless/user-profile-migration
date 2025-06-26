@@ -18,6 +18,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
     echo "  $0                                    # Use sample backup structure"
     echo "  $0 backup_20241225_120000            # Preview restore from directory"
     echo "  $0 backup_20241225_120000.tar.gz     # Preview restore from archive"
+    echo "  $0 backup.encrypted.tar.gz           # Preview restore from encrypted archive"
     echo ""
     echo "This script will show:"
     echo "  • What backup contents would be validated"

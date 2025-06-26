@@ -17,6 +17,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
     echo "  $0 --all                             # Restore all (if run from archive directory)"
     echo "  $0 backup_20241225_120000            # Interactive mode with directory"
     echo "  $0 backup_20241225_120000.tar.gz     # Interactive mode with archive"
+    echo "  $0 backup.encrypted.tar.gz           # Interactive mode with encrypted archive"
     echo "  $0 backup_20241225_120000 --all      # Restore all with directory"
     echo ""
     echo "Granular Categories:"
@@ -36,6 +37,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
     echo "  • Launch Agents: Select individual startup services with loading guidance"
     echo "  • Backup Validation: Verify backup integrity before restoration"
     echo "  • Post-Restore Guidance: Step-by-step next actions"
+    echo "  • Password Protection: Support for encrypted backup archives"
     echo ""
     echo "Options:"
     echo "  --all         Restore everything without interactive selection"
@@ -95,6 +97,42 @@ if [[ "$BACKUP_INPUT" == *.tar.gz ]]; then
         exit 1
     fi
     
+    # Check if it's an encrypted archive
+    if [[ "$BACKUP_INPUT" == *.encrypted.tar.gz ]]; then
+        echo "🔒 Encrypted backup detected"
+        echo "Decrypting archive: $BACKUP_INPUT"
+        
+        # Prompt for password
+        echo "Enter password for backup decryption:"
+        read -s DECRYPT_PASSWORD
+        
+        if [[ -z "$DECRYPT_PASSWORD" ]]; then
+            echo "Error: Password cannot be empty"
+            exit 1
+        fi
+        
+        # Create temporary decrypted file
+        TEMP_ARCHIVE="${BACKUP_INPUT%.encrypted.tar.gz}.temp.tar.gz"
+        
+        echo "Decrypting backup..."
+        openssl enc -aes-256-cbc -d -salt -pbkdf2 -iter 100000 -in "$BACKUP_INPUT" -out "$TEMP_ARCHIVE" -pass pass:"$DECRYPT_PASSWORD"
+        
+        if [[ $? -ne 0 ]]; then
+            echo "❌ Error: Failed to decrypt backup. Check your password."
+            rm -f "$TEMP_ARCHIVE"
+            exit 1
+        fi
+        
+        echo "✅ Backup successfully decrypted"
+        
+        # Clear password from memory
+        unset DECRYPT_PASSWORD
+        
+        # Use the decrypted archive
+        BACKUP_INPUT="$TEMP_ARCHIVE"
+        CLEANUP_DECRYPTED=true
+    fi
+    
     echo "Extracting archive: $BACKUP_INPUT"
     EXTRACT_DIR="$(dirname "$BACKUP_INPUT")"
     tar -xzf "$BACKUP_INPUT" -C "$EXTRACT_DIR"
@@ -103,6 +141,11 @@ if [[ "$BACKUP_INPUT" == *.tar.gz ]]; then
     BACKUP_DIR="$EXTRACT_DIR/$(basename "$BACKUP_INPUT" .tar.gz)"
     CLEANUP_EXTRACTED=true
     echo "Extracted to: $BACKUP_DIR"
+    
+    # Clean up temporary decrypted file if it exists
+    if [[ "${CLEANUP_DECRYPTED:-false}" == true ]]; then
+        rm -f "$TEMP_ARCHIVE"
+    fi
 elif [[ -d "$BACKUP_INPUT" ]]; then
     BACKUP_DIR="$BACKUP_INPUT"
 else

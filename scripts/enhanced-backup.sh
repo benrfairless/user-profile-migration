@@ -5,6 +5,55 @@
 
 set -e
 
+# Check for help flag
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo "Enhanced User Profile Backup Script"
+    echo "Creates comprehensive system backup for Mac rebuild"
+    echo ""
+    echo "Usage: $0 [--no-password] [--help]"
+    echo ""
+    echo "Options:"
+    echo "  --no-password    Create unencrypted backup (NOT recommended)"
+    echo "  --help           Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0                    # Create password-protected backup (default)"
+    echo "  $0 --no-password     # Create unencrypted backup"
+    echo ""
+    echo "Features:"
+    echo "  • Comprehensive system information capture"
+    echo "  • Application inventory and configurations"
+    echo "  • System preferences and custom fonts"
+    echo "  • Network and security settings"
+    echo "  • Self-contained backup with restoration scripts"
+    echo "  • Password protection by default for security"
+    echo ""
+    echo "Security Note:"
+    echo "  Password protection is enabled by default to secure your personal"
+    echo "  configuration data. Use --no-password only if you're certain the"
+    echo "  backup will be stored securely."
+    exit 0
+fi
+
+# Check for no-password flag
+USE_PASSWORD=true
+if [[ "$1" == "--no-password" ]]; then
+    USE_PASSWORD=false
+    echo "⚠️  WARNING: Password protection disabled"
+    echo "   Your backup will contain personal configuration data unencrypted"
+    echo ""
+    read -p "Are you sure you want to proceed without encryption? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Backup cancelled. Run without --no-password for encrypted backup."
+        exit 0
+    fi
+    echo ""
+else
+    echo "🔒 Password protection enabled (default)"
+    echo ""
+fi
+
 BACKUP_DIR="$HOME/user_profile_backup_$(date +%Y%m%d_%H%M%S)"
 echo "Creating enhanced backup in: $BACKUP_DIR"
 mkdir -p "$BACKUP_DIR"
@@ -304,10 +353,100 @@ fi
 echo "Creating final compressed archive with all scripts included..."
 tar -czf "$ARCHIVE_NAME" -C "$(dirname "$BACKUP_DIR")" "$(basename "$BACKUP_DIR")"
 
+# Password protection (default behavior)
+if [[ "$USE_PASSWORD" == true ]]; then
+    echo ""
+    echo "=== Password Protection ==="
+    echo "Your backup contains personal configuration data and will be encrypted."
+    echo ""
+    
+    # Prompt for password
+    while true; do
+        echo "Enter password for backup encryption:"
+        read -s PASSWORD
+        echo "Confirm password:"
+        read -s PASSWORD_CONFIRM
+        
+        if [[ -z "$PASSWORD" ]]; then
+            echo "❌ Error: Password cannot be empty"
+            echo ""
+            continue
+        fi
+        
+        if [[ "$PASSWORD" != "$PASSWORD_CONFIRM" ]]; then
+            echo "❌ Error: Passwords do not match"
+            echo ""
+            continue
+        fi
+        
+        # Check password strength (basic check)
+        if [[ ${#PASSWORD} -lt 8 ]]; then
+            echo "⚠️  Warning: Password is less than 8 characters"
+            read -p "Continue with this password? (y/N): " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo ""
+                continue
+            fi
+        fi
+        
+        break
+    done
+    
+    # Create encrypted version
+    ENCRYPTED_ARCHIVE="${ARCHIVE_NAME%.tar.gz}.encrypted.tar.gz"
+    echo ""
+    echo "🔒 Encrypting backup archive..."
+    echo "Creating encrypted archive: $(basename "$ENCRYPTED_ARCHIVE")"
+    
+    # Use AES-256-CBC encryption with stronger key derivation
+    openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 -in "$ARCHIVE_NAME" -out "$ENCRYPTED_ARCHIVE" -pass pass:"$PASSWORD"
+    
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Backup successfully encrypted with AES-256-CBC"
+        
+        # Remove unencrypted version for security
+        rm "$ARCHIVE_NAME"
+        ARCHIVE_NAME="$ENCRYPTED_ARCHIVE"
+        
+        # Update size information
+        COMPRESSED_SIZE=$(du -sh "$ARCHIVE_NAME" | cut -f1)
+        
+        echo "🔒 Encrypted backup: $(basename "$ARCHIVE_NAME")"
+        echo "🔒 Final size: $COMPRESSED_SIZE"
+    else
+        echo "❌ Error: Failed to encrypt backup"
+        echo "Unencrypted backup available: $ARCHIVE_NAME"
+        exit 1
+    fi
+    
+    # Clear password from memory
+    unset PASSWORD
+    unset PASSWORD_CONFIRM
+fi
+
 echo ""
 echo "=== Enhanced Backup Complete ==="
-echo "Backup archive: $ARCHIVE_NAME"
-echo "Compressed size: $COMPRESSED_SIZE (was $ORIGINAL_SIZE)"
+echo "Backup archive: $(basename "$ARCHIVE_NAME")"
+echo "Final size: $COMPRESSED_SIZE (was $ORIGINAL_SIZE)"
+
+if [[ "$USE_PASSWORD" == true ]]; then
+    echo "🔒 Backup is password-protected with AES-256-CBC encryption"
+    echo ""
+    echo "To restore this encrypted backup:"
+    echo "1. Transfer $(basename "$ARCHIVE_NAME") to your new Mac"
+    echo "2. Run: ./enhanced-restore.sh $(basename "$ARCHIVE_NAME")"
+    echo "3. Enter your password when prompted"
+    echo ""
+    echo "⚠️  Important: Keep your password safe! Without it, your backup cannot be restored."
+else
+    echo "⚠️  Backup is NOT encrypted"
+    echo ""
+    echo "Transfer Instructions:"
+    echo "1. Copy $(basename "$ARCHIVE_NAME") to your backup location"
+    echo "2. On your new Mac, extract: tar -xzf $(basename "$ARCHIVE_NAME")"
+    echo "3. Run: ./$(basename "$BACKUP_DIR")/enhanced_restore.sh ./$(basename "$BACKUP_DIR")"
+fi
 echo ""
 echo "This enhanced backup includes:"
 echo "✓ All original configurations"
