@@ -5,6 +5,105 @@ All notable changes to the Enhanced Mac User Profile Migration Scripts project w
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2024-06-26
+
+### 🔒 Security Enhancement Release
+
+This release adds password protection by default to enhance the security of backup archives containing personal configuration data.
+
+### Added
+
+#### Password Protection by Default
+- **Default Encryption**: All backups are now password-protected by default
+- **AES-256-CBC Encryption**: Strong encryption with PBKDF2 key derivation (100,000 iterations)
+- **Password Strength Validation**: Basic password length checking with warnings
+- **Secure Password Handling**: Passwords cleared from memory after use
+- **Encrypted Archive Detection**: Automatic detection and decryption of encrypted backups
+
+#### Enhanced Security Features
+- **Opt-out Security**: Use `--no-password` flag to create unencrypted backups (with warning)
+- **Password Confirmation**: Double-entry password verification during backup creation
+- **Decryption Support**: Seamless decryption during restore process
+- **Temporary File Cleanup**: Secure cleanup of temporary decrypted files
+
+#### Improved User Experience
+- **Clear Security Messaging**: Users understand why password protection is important
+- **Helpful Instructions**: Guidance for both encrypted and unencrypted backup workflows
+- **Error Handling**: Better error messages for incorrect passwords or encryption failures
+- **Progress Indicators**: Clear feedback during encryption/decryption processes
+
+### Enhanced
+
+#### Backup Script Improvements
+- **Default Security**: Password protection enabled by default for all backups
+- **User Choice**: Option to disable encryption with explicit warning and confirmation
+- **Stronger Encryption**: Upgraded to PBKDF2 with 100,000 iterations for better security
+- **Better UX**: Improved prompts and feedback during password entry
+
+#### Restore Script Improvements
+- **Automatic Detection**: Recognizes encrypted archives by filename pattern
+- **Seamless Decryption**: Prompts for password and decrypts transparently
+- **Error Recovery**: Graceful handling of decryption failures
+- **Cleanup**: Secure removal of temporary decrypted files
+
+#### Documentation Updates
+- **Security Focus**: Updated help text to emphasize security benefits
+- **Usage Examples**: Added examples for encrypted backup workflows
+- **Best Practices**: Guidance on password management and backup security
+
+### Security Considerations
+
+#### Why Password Protection by Default?
+- **Personal Data**: Backups contain SSH configs, application credentials, and personal settings
+- **Cloud Storage**: Many users store backups in cloud services (iCloud, Dropbox, etc.)
+- **Shared Systems**: Backups may be accessed on shared or public computers
+- **Best Practice**: Industry standard to encrypt sensitive data at rest
+
+#### Encryption Details
+- **Algorithm**: AES-256-CBC (Advanced Encryption Standard, 256-bit key)
+- **Key Derivation**: PBKDF2 with SHA-256 and 100,000 iterations
+- **Salt**: Random salt added to prevent rainbow table attacks
+- **Implementation**: Uses OpenSSL, available on all macOS systems
+
+### Migration from v2.0.0
+
+#### For Existing Users
+- **Backward Compatibility**: v2.0.0 unencrypted backups still work perfectly
+- **New Default**: New backups will be encrypted by default
+- **Opt-out Available**: Use `--no-password` if encryption is not desired
+- **No Breaking Changes**: All existing workflows continue to work
+
+#### Recommended Actions
+1. **Create new encrypted backup**: Run `./enhanced-backup.sh` (will prompt for password)
+2. **Store password securely**: Use a password manager or secure note
+3. **Test restore process**: Verify you can decrypt and restore your backup
+4. **Update documentation**: Note the password requirement for your backup
+
+### Files Modified
+- `scripts/enhanced-backup.sh` - Added default password protection
+- `scripts/enhanced-restore.sh` - Added encrypted archive support
+- `scripts/dry-run-backup.sh` - Updated to show password protection options
+- `scripts/dry-run-restore.sh` - Added encrypted archive examples
+- `CHANGELOG.md` - This changelog entry
+- `README.md` - Updated with password protection information
+
+### Technical Details
+
+#### Backup Process Changes
+1. **Password Prompt**: User enters and confirms password
+2. **Archive Creation**: Standard tar.gz archive created first
+3. **Encryption**: Archive encrypted with AES-256-CBC
+4. **Cleanup**: Original unencrypted archive securely deleted
+5. **Naming**: Encrypted archives use `.encrypted.tar.gz` extension
+
+#### Restore Process Changes
+1. **Detection**: Automatic detection of encrypted archives
+2. **Decryption**: Password prompt and decryption to temporary file
+3. **Extraction**: Standard extraction from decrypted archive
+4. **Cleanup**: Temporary decrypted file securely removed
+
+---
+
 ## [2.0.0] - 2024-06-25
 
 ### 🚀 Major Enhancement Release
