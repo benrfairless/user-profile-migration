@@ -56,6 +56,36 @@ fi
 
 BACKUP_DIR="$HOME/user_profile_backup_$(date +%Y%m%d_%H%M%S)"
 echo "Creating enhanced backup in: $BACKUP_DIR"
+
+# Check prerequisites
+echo "=== Checking Prerequisites ==="
+
+# Check OpenSSL availability (required for encryption)
+if ! command -v openssl &> /dev/null; then
+    echo "❌ Error: OpenSSL not found"
+    echo "OpenSSL is required for password protection but is not available."
+    echo "Please install OpenSSL or use --no-password flag."
+    exit 1
+fi
+
+# Check available disk space
+echo "Checking available disk space..."
+AVAILABLE_SPACE=$(df -k "$HOME" | tail -1 | awk '{print $4}')
+AVAILABLE_GB=$((AVAILABLE_SPACE / 1024 / 1024))
+
+if [[ $AVAILABLE_GB -lt 5 ]]; then
+    echo "⚠️  Warning: Low disk space available (${AVAILABLE_GB}GB)"
+    echo "Backup may require 1-3GB of space. Continue anyway?"
+    read -p "Continue? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Backup cancelled due to insufficient disk space."
+        exit 0
+    fi
+else
+    echo "✅ Sufficient disk space available (${AVAILABLE_GB}GB)"
+fi
+
 mkdir -p "$BACKUP_DIR"
 
 # Function to safely copy files/directories
@@ -379,9 +409,22 @@ if [[ "$USE_PASSWORD" == true ]]; then
             continue
         fi
         
-        # Check password strength (basic check)
+        # Check password strength (enhanced validation)
         if [[ ${#PASSWORD} -lt 8 ]]; then
             echo "⚠️  Warning: Password is less than 8 characters"
+            read -p "Continue with this password? (y/N): " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo ""
+                continue
+            fi
+        elif [[ ${#PASSWORD} -lt 12 ]]; then
+            echo "💡 Tip: Passwords 12+ characters are more secure"
+        fi
+        
+        # Check for common weak passwords
+        if [[ "$PASSWORD" =~ ^[0-9]+$ ]]; then
+            echo "⚠️  Warning: Password contains only numbers"
             read -p "Continue with this password? (y/N): " -n 1 -r
             echo
             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -400,10 +443,38 @@ if [[ "$USE_PASSWORD" == true ]]; then
     echo "Creating encrypted archive: $(basename "$ENCRYPTED_ARCHIVE")"
     
     # Use AES-256-CBC encryption with stronger key derivation
+    echo "🔐 Encrypting with AES-256-CBC (this may take a moment)..."
     openssl enc -aes-256-cbc -salt -pbkdf2 -iter 100000 -in "$ARCHIVE_NAME" -out "$ENCRYPTED_ARCHIVE" -pass pass:"$PASSWORD"
     
     if [[ $? -eq 0 ]]; then
         echo "✅ Backup successfully encrypted with AES-256-CBC"
+        
+        # Verify the encrypted file was created and has reasonable size
+        if [[ -f "$ENCRYPTED_ARCHIVE" ]]; then
+            ENCRYPTED_SIZE=$(stat -f%z "$ENCRYPTED_ARCHIVE" 2>/dev/null || echo "0")
+            ORIGINAL_SIZE_BYTES=$(stat -f%z "$ARCHIVE_NAME" 2>/dev/null || echo "0")
+            
+            # Encrypted file should be roughly the same size (within 10% variance)
+            MIN_SIZE=$((ORIGINAL_SIZE_BYTES * 90 / 100))
+            MAX_SIZE=$((ORIGINAL_SIZE_BYTES * 110 / 100))
+            
+            if [[ $ENCRYPTED_SIZE -lt $MIN_SIZE || $ENCRYPTED_SIZE -gt $MAX_SIZE ]]; then
+                echo "⚠️  Warning: Encrypted file size seems unusual"
+                echo "   Original: $(du -sh "$ARCHIVE_NAME" | cut -f1)"
+                echo "   Encrypted: $(du -sh "$ENCRYPTED_ARCHIVE" | cut -f1)"
+                echo "   This might indicate an encryption issue."
+                read -p "Continue anyway? (y/N): " -n 1 -r
+                echo
+                if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                    echo "Backup cancelled. Keeping unencrypted version."
+                    exit 1
+                fi
+            fi
+        else
+            echo "❌ Error: Encrypted file was not created"
+            echo "Keeping unencrypted backup: $ARCHIVE_NAME"
+            exit 1
+        fi
         
         # Remove unencrypted version for security
         rm "$ARCHIVE_NAME"
@@ -416,7 +487,13 @@ if [[ "$USE_PASSWORD" == true ]]; then
         echo "🔒 Final size: $COMPRESSED_SIZE"
     else
         echo "❌ Error: Failed to encrypt backup"
+        echo "OpenSSL returned error code: $?"
         echo "Unencrypted backup available: $ARCHIVE_NAME"
+        echo ""
+        echo "Possible causes:"
+        echo "- Insufficient disk space"
+        echo "- OpenSSL version compatibility issue"
+        echo "- File permissions problem"
         exit 1
     fi
     

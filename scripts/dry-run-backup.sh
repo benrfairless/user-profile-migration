@@ -102,8 +102,8 @@ echo ""
 echo "=== Homebrew Configuration ==="
 if command -v brew &> /dev/null; then
     echo "✓ Would generate fresh Brewfile from current installations"
-    local formula_count=$(brew list --formula 2>/dev/null | wc -l | tr -d ' ')
-    local cask_count=$(brew list --cask 2>/dev/null | wc -l | tr -d ' ')
+    formula_count=$(brew list --formula 2>/dev/null | wc -l | tr -d ' ')
+    cask_count=$(brew list --cask 2>/dev/null | wc -l | tr -d ' ')
     echo "  └─ Current packages: $formula_count formulae, $cask_count casks"
     
     dry_run_command "brew --version" "homebrew/brew_version.txt" "Homebrew version"
@@ -119,8 +119,8 @@ dry_run_copy "$HOME/.Brewfile" "homebrew/" "Homebrew"
 
 echo ""
 echo "=== Application Configurations ==="
-local app_configs=(".aws" ".azure" ".config" ".docker" ".orbstack" ".terraform.d" ".vagrant.d" ".vscode" ".iterm2" ".1password" ".gnupg" ".npm" ".local")
-local app_names=("AWS CLI" "Azure CLI" "General Config" "Docker" "OrbStack" "Terraform" "Vagrant" "VS Code" "iTerm2" "1Password" "GnuPG" "NPM" "Local")
+app_configs=(".aws" ".azure" ".config" ".docker" ".orbstack" ".terraform.d" ".vagrant.d" ".vscode" ".iterm2" ".1password" ".gnupg" ".npm" ".local")
+app_names=("AWS CLI" "Azure CLI" "General Config" "Docker" "OrbStack" "Terraform" "Vagrant" "VS Code" "iTerm2" "1Password" "GnuPG" "NPM" "Local")
 
 for i in "${!app_configs[@]}"; do
     dry_run_copy "$HOME/${app_configs[$i]}" "app_configs/" "Application"
@@ -154,7 +154,7 @@ dry_run_command "ls -la $HOME/Applications" "applications/user_applications.txt"
 
 if command -v mas &> /dev/null; then
     dry_run_command "mas list" "applications/mas_apps.txt" "Mac App Store apps"
-    local mas_count=$(mas list 2>/dev/null | wc -l | tr -d ' ')
+    mas_count=$(mas list 2>/dev/null | wc -l | tr -d ' ')
     echo "  └─ Mac App Store apps: $mas_count"
 else
     echo "✗ mas (Mac App Store CLI) not found - install with: brew install mas"
@@ -237,7 +237,7 @@ for item in "$HOME/.oh-my-zsh" "$HOME/.asdf" "$HOME/.config" "$HOME/.docker" "$H
     if [[ -e "$item" ]]; then
         SIZE=$(du -sk "$item" 2>/dev/null | cut -f1 || echo "0")
         TOTAL_SIZE=$((TOTAL_SIZE + SIZE))
-        local readable_size=$(du -sh "$item" 2>/dev/null | cut -f1 || echo "unknown")
+        readable_size=$(du -sh "$item" 2>/dev/null | cut -f1 || echo "unknown")
         echo "  └─ $(basename "$item"): $readable_size"
     fi
 done

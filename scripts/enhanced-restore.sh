@@ -100,30 +100,67 @@ if [[ "$BACKUP_INPUT" == *.tar.gz ]]; then
     # Check if it's an encrypted archive
     if [[ "$BACKUP_INPUT" == *.encrypted.tar.gz ]]; then
         echo "🔒 Encrypted backup detected"
+        
+        # Check OpenSSL availability
+        if ! command -v openssl &> /dev/null; then
+            echo "❌ Error: OpenSSL not found"
+            echo "OpenSSL is required to decrypt this backup but is not available."
+            echo "Please install OpenSSL to restore encrypted backups."
+            exit 1
+        fi
+        
         echo "Decrypting archive: $BACKUP_INPUT"
         
-        # Prompt for password
-        echo "Enter password for backup decryption:"
-        read -s DECRYPT_PASSWORD
+        # Prompt for password with retry logic
+        MAX_ATTEMPTS=3
+        ATTEMPT=1
         
-        if [[ -z "$DECRYPT_PASSWORD" ]]; then
-            echo "Error: Password cannot be empty"
+        while [[ $ATTEMPT -le $MAX_ATTEMPTS ]]; do
+            echo "Enter password for backup decryption (attempt $ATTEMPT of $MAX_ATTEMPTS):"
+            read -s DECRYPT_PASSWORD
+            
+            if [[ -z "$DECRYPT_PASSWORD" ]]; then
+                echo "❌ Error: Password cannot be empty"
+                ((ATTEMPT++))
+                continue
+            fi
+            
+            # Create temporary decrypted file
+            TEMP_ARCHIVE="${BACKUP_INPUT%.encrypted.tar.gz}.temp.tar.gz"
+            
+            echo "🔐 Decrypting backup (this may take a moment)..."
+            openssl enc -aes-256-cbc -d -salt -pbkdf2 -iter 100000 -in "$BACKUP_INPUT" -out "$TEMP_ARCHIVE" -pass pass:"$DECRYPT_PASSWORD" 2>/dev/null
+            
+            if [[ $? -eq 0 && -f "$TEMP_ARCHIVE" ]]; then
+                # Verify the decrypted file is a valid tar.gz
+                if tar -tzf "$TEMP_ARCHIVE" >/dev/null 2>&1; then
+                    echo "✅ Backup successfully decrypted"
+                    break
+                else
+                    echo "❌ Error: Decrypted file is not a valid archive"
+                    rm -f "$TEMP_ARCHIVE"
+                    ((ATTEMPT++))
+                fi
+            else
+                echo "❌ Error: Failed to decrypt backup. Check your password."
+                rm -f "$TEMP_ARCHIVE"
+                ((ATTEMPT++))
+            fi
+            
+            if [[ $ATTEMPT -le $MAX_ATTEMPTS ]]; then
+                echo ""
+            fi
+        done
+        
+        if [[ $ATTEMPT -gt $MAX_ATTEMPTS ]]; then
+            echo ""
+            echo "❌ Failed to decrypt backup after $MAX_ATTEMPTS attempts."
+            echo "Please verify:"
+            echo "- You're using the correct password"
+            echo "- The backup file is not corrupted"
+            echo "- You have sufficient disk space"
             exit 1
         fi
-        
-        # Create temporary decrypted file
-        TEMP_ARCHIVE="${BACKUP_INPUT%.encrypted.tar.gz}.temp.tar.gz"
-        
-        echo "Decrypting backup..."
-        openssl enc -aes-256-cbc -d -salt -pbkdf2 -iter 100000 -in "$BACKUP_INPUT" -out "$TEMP_ARCHIVE" -pass pass:"$DECRYPT_PASSWORD"
-        
-        if [[ $? -ne 0 ]]; then
-            echo "❌ Error: Failed to decrypt backup. Check your password."
-            rm -f "$TEMP_ARCHIVE"
-            exit 1
-        fi
-        
-        echo "✅ Backup successfully decrypted"
         
         # Clear password from memory
         unset DECRYPT_PASSWORD
