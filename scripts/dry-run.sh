@@ -118,7 +118,14 @@ dry_run_command "ls -la $HOME/Applications" "User Applications folder"
 if command -v mas &> /dev/null; then
     dry_run_command "mas list" "Mac App Store apps"
 else
-    echo "✗ mas (Mac App Store CLI) not found - install with: brew install mas"
+    echo "✗ mas (Mac App Store CLI) not found"
+    if command -v brew &> /dev/null; then
+        echo "  → Will attempt to install mas via Homebrew during backup"
+        echo "  → If successful, Mac App Store apps will be captured"
+    else
+        echo "  → Homebrew not available - Mac App Store apps will be skipped"
+        echo "  → Install Homebrew and mas to capture Mac App Store apps"
+    fi
 fi
 dry_run_command "system_profiler SPApplicationsDataType" "All installed applications"
 

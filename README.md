@@ -38,12 +38,13 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 
 ### Comprehensive System Capture
 - **System Information**: Hardware specs, macOS version, kernel info, memory, storage, displays, USB devices
-- **Application Inventory**: Complete list of all installed applications (including Mac App Store apps if `mas` is installed)
+- **Application Inventory**: Complete list of all installed applications (Mac App Store apps automatically included if Homebrew is available)
 - **System Preferences**: Dock, Finder, desktop, keyboard, trackpad, menu bar settings (captured for reference)
 - **Custom Fonts**: User-installed fonts from `~/Library/Fonts`
 - **Network Configuration**: WiFi networks, hardware ports, network services, interfaces
 - **Security Settings**: Gatekeeper, System Integrity Protection, firewall status
 - **Browser Data**: Chrome bookmarks, preferences, and extensions list (Safari requires manual export)
+- **Automatic Tool Installation**: Missing tools like `mas` (Mac App Store CLI) are automatically installed via Homebrew when available
 
 ### Granular Restoration Control
 - **10 Main Categories** with selective restoration
@@ -280,7 +281,7 @@ cat user_profile_backup_*/system_info/backup_summary.txt
 - Display and USB device information
 - Disk usage and partition info
 - Environment variables
-- Installed applications inventory
+- Installed applications inventory (Mac App Store apps automatically included)
 
 ### Configuration Files
 - Shell configurations (`.zshrc`, `.bashrc`, etc.)

@@ -287,9 +287,30 @@ save_command_output "ls -la $HOME/Applications" "$BACKUP_DIR/applications/user_a
 
 # Mac App Store applications
 if command -v mas &> /dev/null; then
+    echo "Found mas CLI, capturing Mac App Store apps..."
     save_command_output "mas list" "$BACKUP_DIR/applications/mas_apps.txt" "Mac App Store apps"
 else
-    echo "mas (Mac App Store CLI) not found - install with: brew install mas"
+    echo "mas (Mac App Store CLI) not found"
+    
+    # Try to install mas if Homebrew is available
+    if command -v brew &> /dev/null; then
+        echo "Installing mas via Homebrew..."
+        if brew install mas; then
+            echo "✅ mas installed successfully"
+            echo "Capturing Mac App Store apps..."
+            save_command_output "mas list" "$BACKUP_DIR/applications/mas_apps.txt" "Mac App Store apps"
+        else
+            echo "❌ Failed to install mas via Homebrew"
+            echo "Mac App Store apps will not be captured in this backup"
+            echo "You can manually install mas later with: brew install mas"
+        fi
+    else
+        echo "Homebrew not available - cannot install mas automatically"
+        echo "Mac App Store apps will not be captured in this backup"
+        echo "To capture Mac App Store apps in future backups:"
+        echo "  1. Install Homebrew: https://brew.sh"
+        echo "  2. Install mas: brew install mas"
+    fi
 fi
 
 # System applications and utilities
