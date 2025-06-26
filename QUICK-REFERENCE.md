@@ -30,8 +30,8 @@
 | 5 | **Application Configs** | AWS, Docker, VS Code, etc. | **✅ Yes** |
 | 6 | System Preferences | Dock, Finder, trackpad | No |
 | 7 | Custom Fonts | User-installed fonts | No |
-| 8 | Browser Data | Bookmarks, preferences | No |
-| 9 | **Launch Agents** | Startup services | **✅ Yes** |
+| 8 | Browser Data | Chrome bookmarks, preferences | No |
+| 9 | **Launch Agents** | Custom startup services | **✅ Yes** |
 | 10 | Network Settings | WiFi, VPN configs | No |
 
 ## 🎯 Application Configuration Selection
@@ -41,13 +41,17 @@ When you select "Application Configurations", you can choose from:
 - **AWS CLI** (`.aws`) - Credentials and config
 - **Azure CLI** (`.azure`) - Azure settings
 - **Docker** (`.docker`) - Docker configuration
+- **OrbStack** (`.orbstack`) - OrbStack settings
 - **VS Code** (`.vscode`) - Editor settings
 - **iTerm2** (`.iterm2`) - Terminal preferences
 - **1Password** (`.1password`) - CLI settings
 - **GnuPG** (`.gnupg`) - GPG configuration
 - **NPM** (`.npm`) - Node package manager
 - **Terraform** (`.terraform.d`) - Terraform settings
-- **And more...**
+- **Vagrant** (`.vagrant.d`) - Vagrant configuration
+- **General Config** (`.config`) - Various app configs
+- **Local Binaries** (`.local`) - User-installed binaries
+- **Plus individual files**: `.nanorc`, `.viminfo`, `.wget-hsts`, `.z`
 
 ## 🚀 Launch Agent Selection
 
@@ -71,8 +75,8 @@ launchctl unload ~/Library/LaunchAgents/[agent-name].plist
 
 ### 1. Preparation
 ```bash
-./scripts/enhanced-dry-run.sh    # Review what will be backed up
-./scripts/enhanced-backup.sh     # Create backup
+./scripts/dry-run.sh    # Review what will be backed up
+./scripts/backup.sh     # Create backup
 ```
 
 ### 2. Fresh System Setup
@@ -81,7 +85,7 @@ launchctl unload ~/Library/LaunchAgents/[agent-name].plist
 
 ### 3. Restoration (Recommended Order)
 ```bash
-./scripts/enhanced-restore.sh backup.tar.gz
+./scripts/restore.sh backup.tar.gz
 ```
 
 **Select in this order:**

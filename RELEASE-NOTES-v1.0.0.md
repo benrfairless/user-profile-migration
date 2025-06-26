@@ -13,13 +13,13 @@ This is the first official release of the Mac User Profile Migration Scripts, pr
 - **Secure Password Handling**: Memory cleanup after use
 
 #### 📊 Comprehensive System Capture
-- **Complete System Information**: Hardware specs, macOS version, installed software
-- **Application Inventory**: All apps including Mac App Store purchases
-- **System Preferences**: Dock, Finder, trackpad, keyboard settings
+- **Complete System Information**: Hardware specs, macOS version, kernel info, memory, storage, displays, USB devices
+- **Application Inventory**: All apps including Mac App Store purchases (if `mas` is installed)
+- **System Preferences**: Dock, Finder, trackpad, keyboard settings (captured for reference)
 - **Custom Fonts**: User-installed fonts with automatic restoration
-- **Network Configuration**: WiFi networks, hardware ports
-- **Security Settings**: Firewall, Gatekeeper, System Integrity Protection
-- **Browser Data**: Bookmarks, preferences, extensions list
+- **Network Configuration**: WiFi networks, hardware ports, network services
+- **Security Settings**: Firewall, Gatekeeper, System Integrity Protection status
+- **Browser Data**: Chrome bookmarks, preferences, extensions list (Safari requires manual export)
 
 #### 🎯 Granular Restoration Control
 - **10 Main Categories** with selective restoration
@@ -64,10 +64,10 @@ This is the first official release of the Mac User Profile Migration Scripts, pr
 2. **Homebrew Packages** - Formulae, casks, services, taps
 3. **Development Tools** - Git, asdf, language versions, IDEs
 4. **SSH Configuration** - Config, known hosts, public keys
-5. **Application Configurations** - AWS, Docker, VS Code, etc. (Individual selection)
+5. **Application Configurations** - AWS, Docker, VS Code, OrbStack, etc. (Individual selection)
 6. **System Preferences** - Dock, Finder, keyboard, trackpad
 7. **Custom Fonts** - User-installed fonts
-8. **Browser Data** - Bookmarks, preferences, extensions
+8. **Browser Data** - Chrome bookmarks, preferences, extensions
 9. **Launch Agents** - Custom startup services (Individual selection)
 10. **Network Settings** - WiFi networks, VPN configs
 

@@ -37,13 +37,13 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 - **Opt-out Option**: Use `--no-password` flag for unencrypted backups (with warning)
 
 ### Comprehensive System Capture
-- **System Information**: Hardware specs, macOS version, installed software
-- **Application Inventory**: All apps including Mac App Store purchases
-- **System Preferences**: Dock, Finder, trackpad, keyboard settings
+- **System Information**: Hardware specs, macOS version, kernel info, memory, storage, displays, USB devices
+- **Application Inventory**: Complete list of all installed applications (including Mac App Store apps if `mas` is installed)
+- **System Preferences**: Dock, Finder, desktop, keyboard, trackpad, menu bar settings (captured for reference)
 - **Custom Fonts**: User-installed fonts from `~/Library/Fonts`
-- **Network Configuration**: WiFi networks, hardware ports
-- **Security Settings**: Firewall, Gatekeeper, System Integrity Protection
-- **Browser Data**: Bookmarks, preferences, extensions list
+- **Network Configuration**: WiFi networks, hardware ports, network services, interfaces
+- **Security Settings**: Gatekeeper, System Integrity Protection, firewall status
+- **Browser Data**: Chrome bookmarks, preferences, and extensions list (Safari requires manual export)
 
 ### Granular Restoration Control
 - **10 Main Categories** with selective restoration
@@ -125,11 +125,16 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 - AWS CLI credentials and config
 - Azure CLI settings
 - Docker configuration
+- OrbStack settings
 - VS Code settings and extensions
 - iTerm2 preferences
 - 1Password CLI settings
 - GnuPG configuration
 - NPM settings
+- Terraform configuration
+- Vagrant settings
+- General config directory
+- Local binaries and scripts
 - And more...
 
 **Interactive Selection**: Choose exactly which application configurations to restore.
@@ -148,9 +153,10 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 
 ### 8. Browser Data
 - Chrome bookmarks and preferences
-- Safari bookmarks
-- Browser extension lists
-- Search engine preferences
+- Chrome extension lists
+- Browser search engine preferences
+
+**Note**: Safari bookmarks require manual export via Safari > File > Export Bookmarks due to System Integrity Protection.
 
 ### 9. Launch Agents ⭐ *Enhanced*
 **Now with individual agent selection:**
@@ -235,10 +241,12 @@ cat user_profile_backup_*/system_info/backup_summary.txt
 ### System Information
 - Hardware specifications and model
 - macOS version and build number
-- Installed applications inventory
-- System profiler data
-- Disk usage and storage info
+- Kernel information
+- Memory and storage details
+- Display and USB device information
+- Disk usage and partition info
 - Environment variables
+- Installed applications inventory
 
 ### Configuration Files
 - Shell configurations (`.zshrc`, `.bashrc`, etc.)

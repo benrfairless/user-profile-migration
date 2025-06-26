@@ -1,6 +1,6 @@
 # Complete Mac Migration Guide
 
-Step-by-step guide for using the enhanced migration scripts to rebuild your Mac from scratch.
+Step-by-step guide for using the migration scripts to rebuild your Mac from scratch.
 
 ## 🎯 Overview
 
@@ -36,16 +36,16 @@ This guide walks you through the complete process of backing up your current Mac
 cd /path/to/user-profile-migration/scripts
 
 # Make scripts executable (if not already)
-chmod +x enhanced-*.sh
+chmod +x *.sh
 
 # Verify scripts are ready
-ls -la enhanced-*.sh
+ls -la *.sh
 ```
 
 #### Step 2: Review What Will Be Backed Up
 ```bash
 # Run dry run to see what would be captured
-./enhanced-dry-run.sh
+./dry-run.sh
 ```
 
 **Review the output carefully:**
@@ -56,7 +56,7 @@ ls -la enhanced-*.sh
 #### Step 3: Create Comprehensive Backup
 ```bash
 # Create the backup (this may take several minutes)
-./enhanced-backup.sh
+./backup.sh
 ```
 
 **What happens:**
@@ -110,13 +110,13 @@ cd user_profile_backup_YYYYMMDD_HHMMSS
 #### Step 8: Validate Backup
 ```bash
 # Verify backup integrity before restoring
-./enhanced-restore.sh . --validate
+./restore.sh . --validate
 ```
 
 #### Step 9: Interactive Restoration
 ```bash
 # Start interactive restoration process
-./enhanced-restore.sh .
+./restore.sh .
 ```
 
 **Follow the interactive prompts:**
@@ -221,7 +221,7 @@ If you only want specific configurations:
 
 ```bash
 # Run restore and select only what you need
-./enhanced-restore.sh backup.tar.gz
+./restore.sh backup.tar.gz
 
 # Example: Only development environment
 # Select: [1] Shell, [2] Homebrew, [3] Development Tools
@@ -365,7 +365,7 @@ ls -la development/
 ### Periodic Backups
 ```bash
 # Create regular backups (monthly/quarterly)
-./enhanced-backup.sh
+./backup.sh
 
 # Keep multiple backup versions
 # Clean up old backups periodically
