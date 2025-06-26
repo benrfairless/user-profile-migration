@@ -8,11 +8,14 @@ Complete solution for backing up and restoring your Mac configuration for clean 
 # Test what would be backed up
 ./scripts/enhanced-dry-run.sh
 
-# Create comprehensive backup
+# Create password-protected backup (default)
 ./scripts/enhanced-backup.sh
 
+# Create unencrypted backup (not recommended)
+./scripts/enhanced-backup.sh --no-password
+
 # Restore with granular control
-./scripts/enhanced-restore.sh backup_archive.tar.gz
+./scripts/enhanced-restore.sh backup.encrypted.tar.gz
 ```
 
 ## 📋 Overview
@@ -25,6 +28,13 @@ These enhanced scripts provide comprehensive Mac system backup and restoration w
 - **Development environment setup** - Restore just your dev tools
 
 ## 🆕 Enhanced Features
+
+### 🔒 Security First
+- **Password Protection by Default**: All backups encrypted with AES-256-CBC encryption
+- **Strong Key Derivation**: PBKDF2 with 100,000 iterations for enhanced security
+- **Automatic Encryption Detection**: Seamless handling of encrypted backup archives
+- **Secure Password Handling**: Passwords cleared from memory after use
+- **Opt-out Option**: Use `--no-password` flag for unencrypted backups (with warning)
 
 ### Comprehensive System Capture
 - **System Information**: Hardware specs, macOS version, installed software
